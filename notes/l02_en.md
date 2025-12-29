@@ -102,10 +102,8 @@ Bias–variance decomposition (handy to remember):
 
 $$
 \mathbb{E}[(Y-a)^2]
-=
-\underbrace{\mathbb{E}[(Y-\mathbb{E}Y)^2]}_{\mathrm{Var}(Y)}
-+
-\underbrace{(\mathbb{E}Y-a)^2}_{\text{Bias}^2}
+= \underbrace{\mathbb{E}\left[(Y-\mathbb{E}[Y])^2\right]}_{\mathrm{Var}(Y)}
++ \underbrace{(\mathbb{E}[Y]-a)^2}_{\text{Bias}^2}
 $$
 
 Takeaway: under L2, the best constant predictor is the **mean**.
@@ -181,9 +179,7 @@ Negating gives CCE.
 ### 6.3 Multinomial (counts over $n$ trials)
 
 $$
-P(n_1,\dots,n_k)
-=
-\frac{n!}{\prod_i n_i!}\prod_i p_i^{n_i}.
+P(n_1,\dots,n_k) = \frac{n!}{\prod_i n_i!}\prod_i p_i^{n_i}.
 $$
 
 When $n=1$, this reduces to the categorical case (single-sample).
