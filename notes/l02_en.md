@@ -10,10 +10,10 @@ I use the engineering (batch-first) convention:
 
 - Single-sample feature: $x^{(i)} \in \mathbb{R}^{n}$ (in code usually a length-$n$ vector)
 - Data matrix: $X \in \mathbb{R}^{m \times n}$, **each row is one sample** ($m$ samples, $n$ features)
-- Multiclass parameters: $\Theta \in \mathbb{R}^{n \times k}$ ($k$ classes)
+- Multiclass parameters: $\theta \in \mathbb{R}^{n \times k}$ ($k$ classes)
 - Logits:
   - Single sample: $h(x^{(i)}) \in \mathbb{R}^{k}$
-  - Batch: $H = X\Theta \in \mathbb{R}^{m \times k}$
+  - Batch: $H = X\theta \in \mathbb{R}^{m \times k}$
 
 ### Mapping the “column-vector” tradition to the “samples-as-rows” convention
 
@@ -23,14 +23,14 @@ $\tilde X = [x^{(1)}, \dots, x^{(m)}] \in \mathbb{R}^{n \times m}$,
 
 so logits are written as
 
-$\Theta^\top \tilde X \in \mathbb{R}^{k \times m}$.
+$\theta^\top \tilde X \in \mathbb{R}^{k \times m}$.
 
 In engineering, I typically use $X = \tilde X^\top$ (samples as rows), so:
 
 $$
-X\Theta = (\tilde X^\top)\Theta
+X\theta = (\tilde X^\top)\theta
 \quad\Longleftrightarrow\quad
-(\Theta^\top \tilde X)^\top
+(\theta^\top \tilde X)^\top
 $$
 
 Takeaway: **these are the same up to transposes. The only real pitfall is mixing the two conventions in one derivation without tracking shapes.**
@@ -54,7 +54,7 @@ I like the cleanliness of column-vector derivations, but in practice (C/C++/NumP
 - With row-major layout, **contiguous access along a row** tends to:
   - reduce cache misses (better 64B locality),
   - and reuse the same activated DRAM row buffer contents (8–16KB locality).
-- This aligns well with the common batch-first GEMM pattern: $X\Theta$.
+- This aligns well with the common batch-first GEMM pattern: $X\theta$.
 
 ---
 
@@ -218,7 +218,7 @@ $$
 
 Let:
 
-- $H = X\Theta \in \mathbb{R}^{m\times k}$
+- $H = X\theta \in \mathbb{R}^{m\times k}$
 - $Z = \mathrm{softmax}(H) \in \mathbb{R}^{m\times k}$ (row-wise softmax)
 - $Y \in \mathbb{R}^{m\times k}$ (one-hot labels)
 - $\Delta = Z - Y$
@@ -226,7 +226,7 @@ Let:
 Then:
 
 $$
-\frac{\partial \mathcal{L}}{\partial \Theta} = X^\top (Z-Y) = X^\top \Delta.
+\frac{\partial \mathcal{L}}{\partial \theta} = X^\top (Z-Y) = X^\top \Delta.
 $$
 
 Implementation-wise: compute $\Delta$ as “predicted probs minus one-hot”, then multiply by $X^\top$.
@@ -255,7 +255,7 @@ $$
 \mathrm{tr}(ABC)=\mathrm{tr}(BCA)=\mathrm{tr}(CAB)
 $$
 
-Typical template (derive $\partial \ell / \partial \Theta$):
+Typical template (derive $\partial \ell / \partial \theta$):
 
 - Start with
 
@@ -266,7 +266,7 @@ $$
 - Use
 
 $$
-dH = d(X\Theta) = X\, d\Theta
+dH = d(X\theta) = X\, d\theta
 $$
 
 - Combine and cycle the trace:
@@ -274,15 +274,15 @@ $$
 $$
 \begin{aligned}
 d\ell
-&= \mathrm{tr}(\Delta^\top X\, d\Theta) \\
-&= \mathrm{tr}\!\left((X^\top \Delta)^\top d\Theta\right)
+&= \mathrm{tr}(\Delta^\top X\, d\theta) \\
+&= \mathrm{tr}\!\left((X^\top \Delta)^\top d\theta\right)
 \end{aligned}
 $$
 
 Therefore:
 
 $$
-\frac{\partial \ell}{\partial \Theta} = X^\top \Delta
+\frac{\partial \ell}{\partial \theta} = X^\top \Delta
 $$
 
 ---
