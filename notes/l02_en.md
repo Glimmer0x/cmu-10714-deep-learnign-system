@@ -102,8 +102,7 @@ Bias–variance decomposition (handy to remember):
 
 $$
 \mathbb{E}[(Y-a)^2]
-= \underbrace{\mathbb{E}\left[(Y-\mathbb{E}[Y])^2\right]}_{\mathrm{Var}(Y)}
-+ \underbrace{(\mathbb{E}[Y]-a)^2}_{\text{Bias}^2}
+= \underbrace{\mathbb{E}\left[(Y-\mathbb{E}[Y])^2\right]}_{\mathrm{Var}(Y)} + \underbrace{(\mathbb{E}[Y]-a)^2}_{\text{Bias}^2}
 $$
 
 Takeaway: under L2, the best constant predictor is the **mean**.
