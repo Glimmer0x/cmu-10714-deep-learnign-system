@@ -233,34 +233,56 @@ Implementation-wise: compute $\Delta$ as “predicted probs minus one-hot”, th
 
 ---
 
-## 8. Matrix Differentials / Trace Trick Cheat Sheet
+## 8. Matrix Differentials / Trace Trick Cheat Sheet (for mechanical derivations)
 
 Three core identities:
 
-1) Differential and trace form:
+1. Differential and trace form:
+
 $$
-df = \mathrm{tr}\Big(\big(\frac{\partial f}{\partial X}\big)^\top dX\Big)
+df = \mathrm{tr}\!\left(\left(\frac{\partial f}{\partial X}\right)^\top dX\right)
 $$
 
-2) Product rule:
+2. Product rule:
+
 $$
 d(AB) = dA\cdot B + A\cdot dB
 $$
 
-3) Trace cyclic permutation:
+3. Trace cyclic permutation:
+
 $$
 \mathrm{tr}(ABC)=\mathrm{tr}(BCA)=\mathrm{tr}(CAB)
 $$
 
-Template for deriving $\partial \ell / \partial \Theta$:
+Typical template (derive $\partial \ell / \partial \Theta$):
 
-- Write $d\ell = \mathrm{tr}(\Delta^\top dH)$
-- Use $dH = d(X\Theta)=X\,d\Theta$
-- Combine and cycle trace:
+- Start with
+
 $$
-d\ell = \mathrm{tr}(\Delta^\top X d\Theta)
-= \mathrm{tr}((X^\top\Delta)^\top d\Theta)
-\Rightarrow \frac{\partial \ell}{\partial \Theta}=X^\top\Delta
+d\ell = \mathrm{tr}(\Delta^\top dH)
+$$
+
+- Use
+
+$$
+dH = d(X\Theta) = X\, d\Theta
+$$
+
+- Combine and cycle the trace:
+
+$$
+\begin{aligned}
+d\ell
+&= \mathrm{tr}(\Delta^\top X\, d\Theta) \\
+&= \mathrm{tr}\!\left((X^\top \Delta)^\top d\Theta\right)
+\end{aligned}
+$$
+
+Therefore:
+
+$$
+\frac{\partial \ell}{\partial \Theta} = X^\top \Delta
 $$
 
 ---
