@@ -102,9 +102,23 @@ def softmax_regression_epoch(X, y, theta, lr = 0.1, batch=100):
     Returns:
         None
     """
-    ### BEGIN YOUR CODE
-    pass
-    ### END YOUR CODE
+    B = X.shape[0] // batch + (1 if X.shape[0] % batch != 0 else 0)
+    for i in range(B):
+        s, e = i * batch, (i + 1) * batch
+        Xb_i = X[s:e]
+        yb_i = y[s:e]
+        Z = Xb_i @ theta
+        M = np.max(Z, axis=1, keepdims=True)
+
+        b, k = Z.shape
+
+        Z_safe= Z - M
+        exp_Z = np.exp(Z_safe)
+        sum_exp = np.sum(exp_Z, axis=1, keepdims=True)
+        probs = exp_Z / sum_exp
+        probs[np.arange(b), yb_i] -= 1
+        grad = Xb_i.T @ probs / b
+        theta -= lr * grad
 
 
 def nn_epoch(X, y, W1, W2, lr = 0.1, batch=100):
