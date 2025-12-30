@@ -144,8 +144,13 @@ def nn_epoch(X, y, W1, W2, lr = 0.1, batch=100):
         None
     """
     ### BEGIN YOUR CODE
-    pass
-    ### END YOUR CODE
+    """
+    Z4 = Softmax(Z3)
+    Z3 = ReLU(Z2 @ W2)
+    Z2 = ReLU(X @ W1)
+    """
+    return None
+    
 
 
 
