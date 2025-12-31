@@ -50,6 +50,7 @@ def parse_mnist(image_filename, label_filename):
         buffer = f.read(num * rows * cols)
         data = np.frombuffer(buffer, dtype=np.uint8)
         images = np.divide(data.reshape(num, rows, cols).astype(np.float32), 255.0)
+        images = images.reshape(num, rows * cols)
     
     with gzip.open(label_filename, 'rb') as f:
         _, num = struct.unpack('>II', f.read(8))
@@ -110,14 +111,16 @@ def softmax_regression_epoch(X, y, theta, lr = 0.1, batch=100):
         Z = Xb_i @ theta
         M = np.max(Z, axis=1, keepdims=True)
 
-        b, k = Z.shape
+        b = Xb_i.shape[0]
 
         Z_safe= Z - M
-        exp_Z = np.exp(Z_safe)
-        sum_exp = np.sum(exp_Z, axis=1, keepdims=True)
-        probs = exp_Z / sum_exp
-        probs[np.arange(b), yb_i] -= 1
-        grad = Xb_i.T @ probs / b
+        exp = np.exp(Z_safe)
+        probs = exp / np.sum(exp, axis=1, keepdims=True)
+        delta = probs
+        delta[np.arange(b), yb_i] -= 1
+        delta /= b
+
+        grad = Xb_i.T @ delta
         theta -= lr * grad
 
 
@@ -143,13 +146,31 @@ def nn_epoch(X, y, W1, W2, lr = 0.1, batch=100):
     Returns:
         None
     """
-    ### BEGIN YOUR CODE
-    """
-    Z4 = Softmax(Z3)
-    Z3 = ReLU(Z2 @ W2)
-    Z2 = ReLU(X @ W1)
-    """
-    return None
+    B = X.shape[0]
+    ### forward pass
+    Z1 = X @ W1
+    M1 = (Z1 > 0)
+    A1 = Z1 * M1
+    Z2 = A1 @ W2
+    
+    m = np.max(Z2, axis=1, keepdims=True)
+    Z2_safe = Z2 - m
+    exp = np.exp(Z2_safe)
+    probs =  exp / np.sum(exp, axis=1, keepdims=True)
+
+    # backward pass
+    delta = probs
+    delta[np.arange(Z2.shape[0]), y] -= 1
+    delta /= B
+    
+    G2 = A1.T @ delta
+    G1 = X.T @ (( delta @ W2.T) * M1)
+
+    # update weights
+    W1 -= lr * G1
+    W2 -= lr * G2
+
+
     
 
 
